@@ -877,7 +877,7 @@ static int stm32l4can_ioctl(struct can_dev_s *dev, int cmd,
               DEBUGASSERT(brp >= 1 && brp <= CAN_BTR_BRP_MAX);
             }
 
-          caninfo("TS1: %d TS2: %d BRP: %d\n",
+          caninfo("TS1: %d TS2: %d BRP: %ld\n",
                   bt->bt_tseg1, bt->bt_tseg2, brp);
 
           /* Configure bit timing. */
@@ -1332,7 +1332,7 @@ static bool stm32l4can_txready(struct can_dev_s *dev)
   /* Return true if any mailbox is available */
 
   regval = stm32l4can_getreg(priv, STM32L4_CAN_TSR_OFFSET);
-  caninfo("CAN%d TSR: %08x\n", priv->port, regval);
+  caninfo("CAN%d TSR: %08lx\n", priv->port, regval);
 
   return (regval & CAN_ALL_MAILBOXES) != 0;
 }
@@ -1363,7 +1363,7 @@ static bool stm32l4can_txempty(struct can_dev_s *dev)
   /* Return true if all mailboxes are available */
 
   regval = stm32l4can_getreg(priv, STM32L4_CAN_TSR_OFFSET);
-  caninfo("CAN%d TSR: %08x\n", priv->port, regval);
+  caninfo("CAN%d TSR: %08lx\n", priv->port, regval);
 
   return (regval & CAN_ALL_MAILBOXES) == CAN_ALL_MAILBOXES;
 }
@@ -1682,7 +1682,7 @@ static int stm32l4can_bittiming(struct stm32l4_can_s *priv)
   uint32_t ts1;
   uint32_t ts2;
 
-  caninfo("CAN%d PCLK1: %d baud: %d\n",
+  caninfo("CAN%d PCLK1: %ld baud: %ld\n",
           priv->port, STM32L4_PCLK1_FREQUENCY, priv->baud);
 
   /* Try to get CAN_BIT_QUANTA quanta in one bit_time.
@@ -1735,7 +1735,7 @@ static int stm32l4can_bittiming(struct stm32l4_can_s *priv)
       DEBUGASSERT(brp >= 1 && brp <= CAN_BTR_BRP_MAX);
     }
 
-  caninfo("TS1: %d TS2: %d BRP: %d\n", ts1, ts2, brp);
+  caninfo("TS1: %ld TS2: %ld BRP: %ld\n", ts1, ts2, brp);
 
   /* Configure bit timing.  This also does the following, less obvious
    * things.  Unless loopback mode is enabled, it:
@@ -1854,7 +1854,7 @@ static int stm32l4can_exitinitmode(struct stm32l4_can_s *priv)
 
   if (timeout < 1)
     {
-      canerr("ERROR: Timed out waiting to exit initialization mode: %08x\n",
+      canerr("ERROR: Timed out waiting to exit initialization mode: %08lx\n",
              regval);
       return -ETIMEDOUT;
     }

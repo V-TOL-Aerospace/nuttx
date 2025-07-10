@@ -1699,10 +1699,10 @@ static void stm32l4_ep0setup(struct stm32l4_usbdev_s *priv)
   struct stm32l4_ep_s   *ep0     = &priv->eplist[EP0];
   struct stm32l4_req_s  *privreq = stm32l4_rqpeek(ep0);
   struct stm32l4_ep_s   *privep;
-  union wb_u           value;
-  union wb_u           index;
-  union wb_u           len;
-  union wb_u           response;
+  union wb_u           value = {};
+  union wb_u           index = {};
+  union wb_u           len = {};
+  union wb_u           response = {};
   bool                 handled = false;
   uint8_t              epno;
   int                  nbytes = 0; /* Assume zero-length packet */
