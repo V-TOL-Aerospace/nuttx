@@ -1,0 +1,11 @@
+--- libcxx/include/__type_traits/decay.h.old	2025-07-10 10:57:38.717960856 +1000
++++ libcxx/include/__type_traits/decay.h	2025-07-10 10:57:44.429200076 +1000
+@@ -25,7 +25,7 @@
+ 
+ _LIBCPP_BEGIN_NAMESPACE_STD
+ 
+-#if __has_builtin(__decay)
++#if false //__has_builtin(__decay)
+ template <class _Tp>
+ using __decay_t _LIBCPP_NODEBUG = __decay(_Tp);
+ 
