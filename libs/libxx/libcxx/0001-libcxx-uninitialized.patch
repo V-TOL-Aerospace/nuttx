@@ -1,0 +1,11 @@
+--- libcxx/include/__hash_table.bak	2025-07-11 10:10:58.099906437 +1000
++++ libcxx/include/__hash_table	2025-07-11 10:10:35.011348845 +1000
+@@ -1826,7 +1826,7 @@
+     size_type __bc = bucket_count();
+     bool __inserted = false;
+     __next_pointer __nd;
+-    size_t __chash;
++    size_t __chash = 0;
+     if (__bc != 0)
+     {
+         __chash = std::__constrain_hash(__hash, __bc);

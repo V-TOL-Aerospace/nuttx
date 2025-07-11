@@ -56,7 +56,9 @@ if(CONFIG_LIBCXX)
         patch -p1 -d ${CMAKE_CURRENT_LIST_DIR}/libcxx <
         ${CMAKE_CURRENT_LIST_DIR}/0001-libc-Fix-failures-with-GCC-14-92663.patch &&
         patch -p1 -d ${CMAKE_CURRENT_LIST_DIR}/libcxx <
-        ${CMAKE_CURRENT_LIST_DIR}/0001-libcxx-disable-has_builtin-decay.patch
+        ${CMAKE_CURRENT_LIST_DIR}/0001-libcxx-disable-has_builtin-decay.patch &&
+        patch -p1 -d ${CMAKE_CURRENT_LIST_DIR}/libcxx <
+        ${CMAKE_CURRENT_LIST_DIR}/0001-libcxx-uninitialized.patch
       DOWNLOAD_NO_PROGRESS true
       TIMEOUT 30)
 
