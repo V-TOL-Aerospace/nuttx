@@ -1173,7 +1173,7 @@ static int stm32l4can_send(struct can_dev_s *dev,
   int dlc;
   int txmb;
 
-  caninfo("CAN%d ID: %d DLC: %d\n",
+  caninfo("CAN%i ID: %lu DLC: %d\n",
           priv->port, msg->cm_hdr.ch_id, msg->cm_hdr.ch_dlc);
 
   /* Select one empty transmit mailbox */
