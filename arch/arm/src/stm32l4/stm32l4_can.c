@@ -138,6 +138,7 @@ static int  stm32l4can_send(struct can_dev_s *dev,
                             struct can_msg_s *msg);
 static bool stm32l4can_txready(struct can_dev_s *dev);
 static bool stm32l4can_txempty(struct can_dev_s *dev);
+static void stm32l4can_txabort(struct can_dev_s *dev);
 
 /* CAN interrupt handling */
 
@@ -148,6 +149,7 @@ static int  stm32l4can_rx1interrupt(int irq, void *context,
                                     void *arg);
 static int  stm32l4can_txinterrupt(int irq, void *context,
                                    void *arg);
+
 
 /* Initialization */
 
@@ -1110,6 +1112,24 @@ static int stm32l4can_ioctl(struct can_dev_s *dev, int cmd,
         }
         break;
 
+      case CANIOC_OFLUSH:
+        {
+          stm32l4can_txabort(dev);
+          return OK;
+        }
+        break;
+
+      /* CANIOC_IOFLUSH: Flush data received but not read and data written
+       *                 but not yet transmitted
+       */
+      case CANIOC_IOFLUSH:
+        {
+          stm32l4can_txabort(dev);
+          //No need or way to flush Rx
+          return OK;
+        }
+        break;
+
       /* Unsupported/unrecognized command */
 
       default:
@@ -1366,6 +1386,49 @@ static bool stm32l4can_txempty(struct can_dev_s *dev)
   caninfo("CAN%d TSR: %08lx\n", priv->port, regval);
 
   return (regval & CAN_ALL_MAILBOXES) == CAN_ALL_MAILBOXES;
+}
+
+
+
+/****************************************************************************
+ * Name: stm32l4can_txabort
+ *
+ * Description:
+ *   CAN TX mailbox abort transmit
+ *
+ * Input Parameters:
+ *   dev - An instance of the "upper half" can driver state structure.
+ *
+ * Returned Value:
+ *   Zero on success; a negated errno on failure
+ *
+ ****************************************************************************/
+
+static void stm32l4can_txabort(struct can_dev_s *dev)
+{
+  struct stm32l4_can_s *priv = dev->cd_priv;
+  uint32_t regval;
+
+  /* Get the transmit status */
+
+  regval = stm32l4can_getreg(priv, STM32L4_CAN_TSR_OFFSET);
+
+  /* For each mailbox that is not empty */
+  if ((regval & CAN_TSR_TME0) == 0)
+    {
+      stm32l4can_putreg(priv, STM32L4_CAN_TSR_OFFSET, CAN_TSR_ABRQ0);
+      caninfo("CAN%d ABRQ0\n", priv->port);
+    }
+  else if ((regval & CAN_TSR_TME1) == 0)
+    {
+      stm32l4can_putreg(priv, STM32L4_CAN_TSR_OFFSET, CAN_TSR_ABRQ1);
+      caninfo("CAN%d ABRQ1\n", priv->port);
+    }
+  else if ((regval & CAN_TSR_TME2) == 0)
+    {
+      stm32l4can_putreg(priv, STM32L4_CAN_TSR_OFFSET, CAN_TSR_ABRQ2);
+      caninfo("CAN%d ABRQ2\n", priv->port);
+    }
 }
 
 /****************************************************************************
