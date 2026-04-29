@@ -3301,6 +3301,14 @@ int cdcacm_classobject(int minor, FAR struct usbdev_devinfo_s *devinfo,
   /* Register the CDC/ACM TTY device */
 
   snprintf(devname, sizeof(devname), CDCACM_DEVNAME_FORMAT, minor);
+
+#if CONFIG_NSH_USBCONSOLE
+  if (strcmp(devname, CONFIG_NSH_USBCONDEV) == 0 && minor == CONFIG_USBDEV_MINOR)
+    {
+      priv->serdev.isconsole = true;
+    }
+#endif
+
   ret = uart_register(devname, &priv->serdev);
   if (ret < 0)
     {
