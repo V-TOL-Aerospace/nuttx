@@ -65,6 +65,12 @@
 
 #define HEAP_BASE  ((uintptr_t)_ebss + CONFIG_IDLETHREAD_STACKSIZE)
 
+
+#ifdef CONFIG_STM32L4_SRAM2_BOOTJUMP
+    #define MAGIC_SRAM_LAST    (SRAM2_END - 4)
+    #define STM32L4_BOOTLOADER_ADDR 0x1FFF0000
+#endif
+
 /* g_idle_topstack: _sbss is the start of the BSS region as defined by the
  * linker script. _ebss lies at the end of the BSS region. The idle task
  * stack starts at the end of BSS and is of size CONFIG_IDLETHREAD_STACKSIZE.
@@ -116,17 +122,37 @@ void __start(void) noinstrument_function;
  *   This is the reset entry point.
  *
  ****************************************************************************/
+static void __set_MSP(uint32_t topOfMainStack) {
+  asm volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
+}
 
 void __start(void)
 {
   const uint32_t *src;
   uint32_t *dest;
+  void (*jump)(void);
+
 
 #ifdef CONFIG_ARMV7M_STACKCHECK
   /* Set the stack limit before we attempt to call any functions */
 
   __asm__ volatile("sub r10, sp, %0" : :
                    "r"(CONFIG_IDLETHREAD_STACKSIZE - 64) :);
+#endif
+
+#ifdef CONFIG_STM32L4_SRAM2_BOOTJUMP
+    dest = (uint32_t *)MAGIC_SRAM_LAST;
+
+    if(*dest == CONFIG_STM32L4_SRAM2_BOOTJUMP_VALUE) {
+      /* Reset the bootloader flag to avoid bootloop */
+      *dest = 0;
+      /* Set up the jump to boot loader address + 4 */
+      jump = (void (*)(void)) (*((uint32_t *) ((STM32L4_BOOTLOADER_ADDR + 4))));
+      /* Set the main stack pointer to the boot loader stack */
+      __set_MSP(*(uint32_t *)STM32L4_BOOTLOADER_ADDR);
+      /* Call the function to jump to boot loader location */
+      jump();
+    }
 #endif
 
 #ifdef CONFIG_STM32L4_SRAM2_INIT
