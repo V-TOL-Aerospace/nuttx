@@ -1020,7 +1020,7 @@ config STM32L4_SRAM2_BOOTJUMP
 
 config STM32L4_SRAM2_BOOTJUMP_VALUE
 	int "SRAM2 DFU boot jump"
-	default 0xDEADBEEF
+	default 3735928559
 	---help---
 		The STM32L4 SRAM2 region can be written to between soft-reboots. This can be
 		used to flag an early-jump to the DFU bootloader on STM32L4 boards before
