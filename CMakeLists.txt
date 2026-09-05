@@ -53,6 +53,10 @@ if(POLICY CMP0169)
   cmake_policy(SET CMP0169 OLD)
 endif()
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "4.3")
+  cmake_policy(SET CMP0205 NEW)
+endif()
+
 # Basic CMake configuration ##################################################
 
 set(CMAKE_CXX_EXTENSIONS OFF)
